@@ -1,4 +1,4 @@
-const { User} = require('../models');
+const { User, Thought} = require('../models');
 
 module.exports = {
   async getUsers(req, res) {
@@ -15,13 +15,21 @@ module.exports = {
     }
   },
   async getUserById(req, res) {
-    const params = req.params[0];
+    const { userId } = req.params;
     try{
-      const user = await User.findOne({_id: params[0]})
+      const user = await User.findOne({_id: userId})
         .select('-__v')
+        .populate({
+          path: 'thoughts',
+          select: '-__v',
+        })
+        .populate({
+          path: 'friends',
+          select: 'username',
+        })
         .lean();
       
-      if(!user) res.status(404).json({message: `No user found with the ID : ${params[0]}`})
+      if(!user) return res.status(404).json({message: `No user found with the ID : ${userId}`})
       
       const userObj = {
         user,
@@ -41,13 +49,13 @@ module.exports = {
     }
   },
   async deleteUserById(req, res) {
-    const params = req.params[0];
+    const { userId } = req.params;
     try{
-      const user = await User.findOneAndRemove({_id: params[0]});
+      const user = await User.findOneAndRemove({_id: userId});
       
-      if(!user) res.status(404).json({message: `No user found with the ID : ${params[0]}`})
+      if(!user) res.status(404).json({message: `No user found with the ID : ${userId}`})
       
-      //TODO Remove Thoughts and Reactions on delete
+      await Thought.deleteMany({ _id: { $in: user.thoughts } }); //BONUS
       return res.json({message: `User ${user.username} successfully deleted`});
     } catch (err){
       console.log(err);
@@ -55,15 +63,15 @@ module.exports = {
     }
   },
   async updateUserById(req, res) {
-    const params = req.params[0];
+    const { userId } = req.params;
     try{
       const user = await User.findOneAndUpdate(
-      { _id: params[0]},
+      { _id: userId},
       { $set: req.body },
       {runValidators: true, new: true}
       );
       
-      if(!user) res.status(404).json({message: `No user found with the ID : ${params[0]}`})
+      if(!user) return res.status(404).json({message: `No user found with the ID : ${userId}`})
       
       const userObj = {
         user,
@@ -75,18 +83,41 @@ module.exports = {
     }
   },
   async addFriend(req, res) {
+    const { userId, friendId} = req.params;
     try {
-      res.status(404).json({message: 'Coming Soon'}); //TODO Adding Friend Logic
+      const user = await User.findOneAndUpdate(
+        { _id: userId},
+        { $addToSet: friendId},
+        {new: true}
+      );
+      
+      if(!user) return res.status(404).json({message: `No user found with the ID : ${userId}`})
+      
+      const userObj = {
+        user,
+      }
+      return res.status(200).json(userObj);
     } catch (err) {
       res.status(500).json(err);
     }
   },
   async removeFriend(req, res) {
+    const { userId, friendId} = req.params;
     try {
-      res.status(404).json({message: 'Coming Soon'}); //TODO Removing Friend Logic
+      const user = await User.findOneAndUpdate(
+        { _id: userId},
+        { $pull: friendId},
+        {new: true}
+      );
+      
+      if(!user) return res.status(404).json({message: `No user found with the ID : ${userId}`})
+      
+      const userObj = {
+        user,
+      }
+      return res.status(200).json(userObj);
     } catch (err) {
       res.status(500).json(err);
     }
   },
-  //TODO Add Thoughts and Reactions
 }

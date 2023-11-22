@@ -14,16 +14,15 @@ const {
 
 // /api/thoughts
 //GET to get all thoughts
-router.route('/').get(getThoughts)
+//Post to create a new thought
+router.route('/').get(getThoughts).post(createThought)
+// TODO (Don't forget to push the created thought's _id to the associate user's thoughts array field)
+// FIXME Left off here where post createThoughts isn't working
 
 // /api/users/:thoughtId
 //GET to get a single thought by its _id
 router.route('/:thoughtId').get(getThoughtsByID)
 
-// /api/users/ POST
-//Post to create a new thought
-router.route('/:thoughtId').post(createThought)
-// TODO (Don't forget to push the created thought's _id to the associate user's thoughts array field)
 
 // /api/users/:thoughtId
 //PUT to update a thought by its _id
@@ -41,3 +40,5 @@ router.route('/:thoughtId/reactions').post(addReaction)
 //api/thoughts/:thoughtId/reactions/:reactionId
 //DELETE to pull and remove a reaction by the reacts reactionId value
 router.route('/:thoughtId/reactions').delete(removeReaction)
+
+module.exports = router;

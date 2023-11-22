@@ -16,7 +16,7 @@ router.route('/').get(getUsers).post(createUser);
 
 // /api/users/:userId
 //Get a single user
-router.route('/:userId').get(getUserById); //TODO populate thought and friend data
+router.route('/:userId').get(getUserById);
 
 // /api/users/:userId
 //PUT to update a user by its _id
@@ -35,3 +35,4 @@ router.route('/:userId/friends/:friendId').post(addFriend);
 // DELETE to remove a friend from a users friends list
 router.route('/:userId/friends/:friendId').delete(removeFriend);
 
+module.exports = router;

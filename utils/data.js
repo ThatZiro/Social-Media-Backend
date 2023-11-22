@@ -1,7 +1,7 @@
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 
 const generateRandomUser = () => ({
-  username: faker.internet.username(),
+  username: faker.internet.userName(),
   email: faker.internet.email(),
 });
 
