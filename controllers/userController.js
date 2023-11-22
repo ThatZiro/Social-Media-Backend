@@ -54,5 +54,39 @@ module.exports = {
       return res.status(500).json(err);
     }
   },
+  async updateUserById(req, res) {
+    const params = req.params[0];
+    try{
+      const user = await User.findOneAndUpdate(
+      { _id: params[0]},
+      { $set: req.body },
+      {runValidators: true, new: true}
+      );
+      
+      if(!user) res.status(404).json({message: `No user found with the ID : ${params[0]}`})
+      
+      const userObj = {
+        user,
+      }
+      return res.status(200).json(userObj);
+    } catch (err){
+      console.log(err);
+      return res.status(500).json(err);
+    }
+  },
+  async addFriend(req, res) {
+    try {
+      res.status(404).json({message: 'Coming Soon'}); //TODO Adding Friend Logic
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  async removeFriend(req, res) {
+    try {
+      res.status(404).json({message: 'Coming Soon'}); //TODO Removing Friend Logic
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
   //TODO Add Thoughts and Reactions
 }
