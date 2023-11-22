@@ -1,36 +1,34 @@
 const router = require('express').Router();
 
-//TODO Add User Controller
+const {
+  getUsers, createUser, getUserById, deleteUserById,
+} = require('../../controllers/userController');
+// ==== example data ====
+// {
+//   "username": "lernantino",
+//   "email": "lernantino@gmail.com"
+// }
 
 // /api/users
-router.route('/') //Get to get all Users
+//GET all users
+//POST create new user
+router.route('/').get(getUsers).post(createUser)
 
 // /api/users/:userId
-router.route('/:userId') //Get a single user populate thought and friend data
-
-// /api/users POST
-// ==== example data ====
-// {
-//   "username": "lernantino",
-//   "email": "lernantino@gmail.com"
-// }
-router.route('/') //Post a new user
+//Get a single user
+router.route('/:userId').get(getUserById)//TODO populate thought and friend data
 
 // /api/users/:userId PUT
-// ==== example data ====
-// {
-//   "username": "lernantino",
-//   "email": "lernantino@gmail.com"
-// }
-router.route('/:userId') //PUT to update a user by its _id
+router.route('/:userId') //TODO PUT to update a user by its _id
 
-// api/users/:userId DELETE
-router.route('/:userId') //DELETE to remove user by its _id
+// api/users/:userId
+//DELETE to remove user by its _id
+router.route('/:userId').delete(deleteUserById)
 //TODO Bonus Remove a users associated thoughts when deleted
 
 // api/users/:userId/friends/:friendId
-router.route('/:userId/friends/:friendId') //Post to add a new friend to a user's friends list
+router.route('/:userId/friends/:friendId') //TODO Post to add a new friend to a user's friends list
 
 //api/users/:userId/friends/:friendId
-router.route('/:userId/friends/:friendId') //DELETE to remove a friend from a users friends list
+router.route('/:userId/friends/:friendId') //TODO DELETE to remove a friend from a users friends list
 
