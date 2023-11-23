@@ -1,4 +1,4 @@
-const { Thought} = require('../models');
+const { Thought, User} = require('../models');
 
 module.exports = {
   async getThoughts(req, res) {
@@ -21,7 +21,7 @@ module.exports = {
       .select('-__v')
       .lean();
       
-      if(!thought) res.status(404).json({message: `No thought found with the ID : ${thoughtId}`})
+      if(!thought) return res.status(404).json({message: `No thought found with the ID : ${thoughtId}`})
       
       const thoughtObj = {
         thought,
@@ -35,8 +35,17 @@ module.exports = {
   },
   async createThought(req, res) {
     try {
-      const user = await Thought.create(req.body);
-      res.json(user);
+      const thought = await Thought.create(req.body);
+      
+      const user = await User.findOneAndUpdate(
+        { _id: req.body.userId },
+        { $push: { thoughts: thought._id } },
+        { new: true }
+      );
+      
+      if(!user) return res.status(404).json({message: `No user found with the ID : ${req.body.userId}`})
+      
+      res.json({ message: 'Thought successfully created!' });
     } catch (err) {
       res.status(500).json(err);
     }
@@ -46,7 +55,7 @@ module.exports = {
     try{
       const thought = await Thought.findOneAndRemove({_id: thoughtId});
       
-      if(!thought) res.status(404).json({message: `No thought found with the ID : ${thoughtId}`})
+      if(!thought) return res.status(404).json({message: `No thought found with the ID : ${thoughtId}`})
       
       return res.json({message: `User ${thought.username} successfully deleted`});
     } catch (err){
@@ -98,9 +107,13 @@ module.exports = {
     try {
       const thought = await Thought.findOneAndUpdate(
         { _id: thoughtId },
-        { $pull: { reactions: {reactionId: reactionId} } },
+        { $pull: { reactions: { _id: reactionId} } },
         { runValidators: true, new: true }
       );
+      
+      console.log('thoughtId:', thoughtId);
+      console.log('reactionId:', reactionId);
+      console.log('Updated Thought:', thought);
       
       if(!thought) return res.status(404).json({message: `No thought found with the ID : ${thoughtId}`})
       
