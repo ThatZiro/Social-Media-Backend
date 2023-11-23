@@ -16,7 +16,6 @@ const {
 //GET to get all thoughts
 //Post to create a new thought
 router.route('/').get(getThoughts).post(createThought);
-// FIXME Left off here where post createThoughts isn't working
 
 // /api/users/:thoughtId
 //GET to get a single thought by its _id
